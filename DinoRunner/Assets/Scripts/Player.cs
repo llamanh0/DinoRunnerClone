@@ -1,11 +1,14 @@
+using System;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
     readonly private float radius = 0.2f;
-    readonly private float jumpPower = 15f;
+    readonly private float jumpPower = 14f;
 
     [SerializeField] private Transform checkGround;
+
+    public static event Action OnPlayerDied;
 
     private BoxCollider2D col;
     private Rigidbody2D rb;
@@ -19,6 +22,8 @@ public class Player : MonoBehaviour
     {
         col = GetComponent<BoxCollider2D>();
         rb = GetComponent<Rigidbody2D>();
+
+        rb.gravityScale = 4.5f;
     }
 
     private void Update()
@@ -29,31 +34,28 @@ public class Player : MonoBehaviour
 
     private void HandleMovement()
     {
-        Up();
-        Down();
-    }
-
-    private void Up()
-    {
         if ((Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.Space)) && isGrounded)
         {
             rb.velocity = Vector2.up * jumpPower;
         }
-    }
 
-    private void Down()
-    {
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            col.size = new(0.6f, 0.6f);
+            col.size = new(col.size.x, 0.6f);
             col.offset = new(0f, -0.2f);
         }
 
         if (Input.GetKeyUp(KeyCode.DownArrow))
         {
-            col.size = new(0.6f, 1f);
+            col.size = new(col.size.x, 1f);
             col.offset = new(0f, 0f);
         }
+    }
+
+    public void Die()
+    {
+        Debug.Log("Player Died!");
+        OnPlayerDied?.Invoke();
     }
 
     private void CheckGround() => isGrounded = Physics2D.OverlapCircle(checkGround.position, radius, groundLayer);

@@ -6,7 +6,11 @@ public class Obstacle : MonoBehaviour
     {
         if(collision.CompareTag("Player"))
         {
-            Time.timeScale = 0f;
+            Player player = collision.GetComponent<Player>();
+            if (player != null)
+            {
+                player.Die();
+            }
         }
     }
 }
