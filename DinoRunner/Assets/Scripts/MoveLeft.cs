@@ -1,24 +1,16 @@
 using UnityEngine;
+
 public class MoveLeft : MonoBehaviour
 {
-    [SerializeField] private float speed = 5f;
-    private void OnEnable()
-    {
-        ScoreManager.OnHundredPointsReached += SpeedUp;
-    }
-
-    private void SpeedUp()
-    {
-        speed += 2f;
-    }
-
     private void Update()
     {
-        transform.Translate(speed * Time.deltaTime * Vector3.left);
-    }
+        if (GameManager.Instance.IsFinished) return;
 
-    private void OnDisable()
-    {
-        ScoreManager.OnHundredPointsReached -= SpeedUp;
+        transform.Translate(SpawnManager.GlobalSpeed * Time.deltaTime * Vector3.left);
+
+        if (transform.position.x < -15f)
+        {
+            Destroy(gameObject);
+        }
     }
 }

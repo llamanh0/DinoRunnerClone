@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    private bool isFinished = false;
+    public bool IsFinished = false;
 
     private void Awake()
     {
@@ -25,9 +26,32 @@ public class GameManager : MonoBehaviour
         Player.OnPlayerDied += HandleGameOver;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R)) RestartGame();
+        if (Input.GetKeyDown(KeyCode.T)) DeleteAllPlayerPrefs();
+    }
+
+    private void OnDisable()
+    {
+        Player.OnPlayerDied -= HandleGameOver;
+    }
+
+    private void DeleteAllPlayerPrefs()
+    {
+        PlayerPrefs.DeleteAll();
+    }
+
+    public void RestartGame()
+    {
+        Time.timeScale = 1.0f;
+        IsFinished = false;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
     private void HandleGameOver()
     {
-        if (!isFinished)
+        if (!IsFinished)
         {
             StartCoroutine(EndGameRoutine());
         }
@@ -35,7 +59,9 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator EndGameRoutine()
     {
-        isFinished = true;
+        IsFinished = true;
+
+        PlayerPrefs.Save();
 
         yield return new WaitForEndOfFrame();
         Time.timeScale = 0f;

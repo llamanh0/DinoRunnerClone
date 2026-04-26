@@ -1,25 +1,48 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI highScoreText;
     [SerializeField] private TextMeshProUGUI milestoneText;
+    [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private Button retryButton;
 
     private float milestoneAnimTime = 0.35f;
 
     private void OnEnable()
     {
+        Player.OnPlayerDied += ShowGameOverUI;
         ScoreManager.OnScoreChanged += UpdateScore;
+        ScoreManager.OnHIChanged += UpdateHI;
         ScoreManager.OnHundredPointsReached += Milestone;
+    }
+
+    private void Start()
+    {
+        retryButton.onClick.RemoveAllListeners();
+        retryButton.onClick.AddListener(() => GameManager.Instance.RestartGame());
     }
 
     private void OnDisable()
     {
+        Player.OnPlayerDied -= ShowGameOverUI;
         ScoreManager.OnScoreChanged -= UpdateScore;
+        ScoreManager.OnHIChanged -= UpdateHI;
         ScoreManager.OnHundredPointsReached -= Milestone;
+    }
+
+    private void ShowGameOverUI()
+    {
+        gameOverPanel.SetActive(true);
+    }
+
+    private void UpdateHI(int highScore)
+    {
+        highScoreText.text = "HI " + highScore.ToString();
     }
 
     private void Milestone()
