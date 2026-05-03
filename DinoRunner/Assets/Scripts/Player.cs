@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    readonly private float radius = 0.2f;
-    readonly private float jumpPower = 14f;
+    private const float Radius = 0.2f;
+    private const float JumpPower = 14f;
 
     [SerializeField] private Transform checkGround;
 
@@ -36,13 +36,13 @@ public class Player : MonoBehaviour
     {
         if ((Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.Space)) && isGrounded)
         {
-            rb.velocity = Vector2.up * jumpPower;
+            rb.velocity = Vector2.up * JumpPower;
         }
 
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            col.size = new(col.size.x, 0.6f);
-            col.offset = new(0f, -0.2f);
+            col.size = new Vector2(col.size.x, 0.6f);
+            col.offset = new Vector2(0f, -0.2f);
         }
 
         if (Input.GetKeyUp(KeyCode.DownArrow))
@@ -54,9 +54,8 @@ public class Player : MonoBehaviour
 
     public void Die()
     {
-        Debug.Log("Player Died!");
         OnPlayerDied?.Invoke();
     }
 
-    private void CheckGround() => isGrounded = Physics2D.OverlapCircle(checkGround.position, radius, groundLayer);
+    private void CheckGround() => isGrounded = Physics2D.OverlapCircle(checkGround.position, Radius, groundLayer);
 }

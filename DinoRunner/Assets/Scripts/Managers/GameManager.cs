@@ -1,69 +1,73 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
-public class GameManager : MonoBehaviour
+namespace Managers
 {
-    public static GameManager Instance;
-
-    public bool IsFinished = false;
-
-    private void Awake()
+    public class GameManager : MonoBehaviour
     {
-        if(Instance == null)
+        public static GameManager Instance;
+
+        public bool isFinished = false;
+
+        private void Awake()
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            if(Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
-        else
+
+        private void OnEnable()
         {
-            Destroy(gameObject);
+            Player.OnPlayerDied += HandleGameOver;
         }
-    }
 
-    private void OnEnable()
-    {
-        Player.OnPlayerDied += HandleGameOver;
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.R)) RestartGame();
-        if (Input.GetKeyDown(KeyCode.T)) DeleteAllPlayerPrefs();
-    }
-
-    private void OnDisable()
-    {
-        Player.OnPlayerDied -= HandleGameOver;
-    }
-
-    private void DeleteAllPlayerPrefs()
-    {
-        PlayerPrefs.DeleteAll();
-    }
-
-    public void RestartGame()
-    {
-        Time.timeScale = 1.0f;
-        IsFinished = false;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-
-    private void HandleGameOver()
-    {
-        if (!IsFinished)
+        private void Update()
         {
-            StartCoroutine(EndGameRoutine());
+            if (Input.GetKeyDown(KeyCode.R)) RestartGame();
+            if (Input.GetKeyDown(KeyCode.T)) DeleteAllPlayerPrefs();
         }
-    }
 
-    private IEnumerator EndGameRoutine()
-    {
-        IsFinished = true;
+        private void OnDisable()
+        {
+            Player.OnPlayerDied -= HandleGameOver;
+        }
 
-        PlayerPrefs.Save();
+        private void DeleteAllPlayerPrefs()
+        {
+            PlayerPrefs.DeleteAll();
+        }
 
-        yield return new WaitForEndOfFrame();
-        Time.timeScale = 0f;
+        public void RestartGame()
+        {
+            Time.timeScale = 1.0f;
+            isFinished = false;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+
+        private void HandleGameOver()
+        {
+            if (!isFinished)
+            {
+                StartCoroutine(EndGameRoutine());
+            }
+        }
+
+        private IEnumerator EndGameRoutine()
+        {
+            isFinished = true;
+
+            PlayerPrefs.Save();
+
+            yield return new WaitForEndOfFrame();
+            Time.timeScale = 0f;
+        }
     }
 }

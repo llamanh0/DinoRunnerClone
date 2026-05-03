@@ -1,10 +1,11 @@
+using Managers;
 using UnityEngine;
 
 public class MoveLeft : MonoBehaviour
 {
     private void Update()
     {
-        if (GameManager.Instance.IsFinished) return;
+        if (GameManager.Instance.isFinished) return;
 
         transform.Translate(SpawnManager.GlobalSpeed * Time.deltaTime * Vector3.left);
 

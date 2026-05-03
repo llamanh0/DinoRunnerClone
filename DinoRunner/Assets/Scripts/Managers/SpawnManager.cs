@@ -1,73 +1,80 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class SpawnManager : MonoBehaviour
+namespace Managers
 {
-    [SerializeField] private List<GameObject> obstaclePrefabs;
-    [SerializeField] private GameObject birdPrefab;
-    [SerializeField] private Transform startPoint;
-
-    public static float GlobalSpeed = 8f;
-    [SerializeField] private float maxSpeed = 20f;
-
-    [SerializeField] private float[] birdYPositions = new float[] { -1.5f, -0.5f, 0.8f };
-
-    private void OnEnable()
+    public class SpawnManager : MonoBehaviour
     {
-        ScoreManager.OnHundredPointsReached += SpeedUp;
-        ScoreManager.OnScoreChanged += CheckUnlockables;
-    }
+        [SerializeField] private List<GameObject> obstaclePrefabs;
+        [SerializeField] private GameObject birdPrefab;
+        [SerializeField] private Transform startPoint;
 
-    private void Start()
-    {
-        GlobalSpeed = 8f;
-        StartCoroutine(SpawnRoutine());
-    }
+        public static float GlobalSpeed = 8f;
+        [SerializeField] private float maxSpeed = 20f;
 
-    private void SpeedUp()
-    {
-        if (GlobalSpeed < maxSpeed)
+        [SerializeField] private float[] birdYPositions = new float[] { -1.5f, -0.5f, 0.8f };
+
+        private void OnEnable()
         {
-            GlobalSpeed += 0.5f;
+            ScoreManager.OnHundredPointsReached += SpeedUp;
+            ScoreManager.OnScoreChanged += CheckUnlockables;
         }
-    }
 
-    private void CheckUnlockables(int score)
-    {
-        if (score >= 500 && !obstaclePrefabs.Contains(birdPrefab))
+        private void Start()
         {
-            obstaclePrefabs.Add(birdPrefab);
+            GlobalSpeed = 8f;
+            StartCoroutine(SpawnRoutine());
         }
-    }
 
-    private IEnumerator SpawnRoutine()
-    {
-        while (!GameManager.Instance.IsFinished)
+        private void SpeedUp()
         {
-            float randomDistance = Random.Range(10f, 20f);
-
-            // t = x / v
-            float spawnDelay = randomDistance / GlobalSpeed;
-
-            yield return new WaitForSeconds(spawnDelay);
-
-            GameObject selectedPrefab = obstaclePrefabs[Random.Range(0, obstaclePrefabs.Count)];
-            Vector3 spawnPos = startPoint.position;
-
-            if (selectedPrefab == birdPrefab)
+            if (GlobalSpeed < maxSpeed)
             {
-                float selectedHeight = birdYPositions[Random.Range(0, birdYPositions.Length)];
-                spawnPos = new Vector3(startPoint.position.x, selectedHeight, startPoint.position.z);
+                GlobalSpeed += 0.5f;
             }
-
-            Instantiate(selectedPrefab, spawnPos, Quaternion.identity);
         }
-    }
 
-    private void OnDisable()
-    {
-        ScoreManager.OnHundredPointsReached -= SpeedUp;
-        ScoreManager.OnScoreChanged -= CheckUnlockables;
+        private void CheckUnlockables(int score)
+        {
+            if (score >= 500 && !obstaclePrefabs.Contains(birdPrefab))
+            {
+                obstaclePrefabs.Add(birdPrefab);
+            }
+        }
+
+        private IEnumerator SpawnRoutine()
+        {
+            while (!GameManager.Instance.isFinished)
+            {
+                float randomDistance = Random.Range(10f, 20f);
+
+                // t = x / v
+                float spawnDelay = randomDistance / GlobalSpeed;
+
+                yield return new WaitForSeconds(spawnDelay);
+
+                GameObject selectedPrefab = obstaclePrefabs[Random.Range(0, obstaclePrefabs.Count)];
+
+                float dynamicHeight;
+                if (selectedPrefab == birdPrefab)
+                {
+                    dynamicHeight = birdYPositions[Random.Range(0, birdYPositions.Length)];
+                }
+                else
+                {
+                    dynamicHeight = selectedPrefab.gameObject.transform.localScale.y / 2;
+                }
+                Vector3 spawnPos = new(startPoint.position.x, dynamicHeight, startPoint.position.z);
+
+                Instantiate(selectedPrefab, spawnPos, Quaternion.identity);
+            }
+        }
+
+        private void OnDisable()
+        {
+            ScoreManager.OnHundredPointsReached -= SpeedUp;
+            ScoreManager.OnScoreChanged -= CheckUnlockables;
+        }
     }
 }
