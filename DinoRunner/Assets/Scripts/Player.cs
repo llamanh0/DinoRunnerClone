@@ -36,7 +36,7 @@ public class Player : MonoBehaviour
     {
         if ((Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.Space)) && isGrounded)
         {
-            rb.velocity = Vector2.up * JumpPower;
+            rb.linearVelocity = Vector2.up * JumpPower;
         }
 
         if (Input.GetKeyDown(KeyCode.DownArrow))
