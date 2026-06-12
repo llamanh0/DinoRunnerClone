@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public static Player Instance;
+
     private const float Radius = 0.2f;
     private const float JumpPower = 14f;
 
@@ -14,9 +16,14 @@ public class Player : MonoBehaviour
     private Rigidbody2D rb;
     private LayerMask groundLayer;
 
-    private bool isGrounded;
+    public bool isGrounded;
+    public bool isCrouching = false;
 
-    private void Awake() => groundLayer = LayerMask.GetMask("Ground");
+    private void Awake()
+    {
+        Instance = this;
+        groundLayer = LayerMask.GetMask("Ground");
+    }
 
     private void Start()
     {
@@ -41,12 +48,14 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
+            isCrouching = true;
             col.size = new Vector2(col.size.x, 0.6f);
             col.offset = new Vector2(0f, -0.2f);
         }
 
         if (Input.GetKeyUp(KeyCode.DownArrow))
         {
+            isCrouching = false;
             col.size = new(col.size.x, 1f);
             col.offset = new(0f, 0f);
         }

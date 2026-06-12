@@ -3,13 +3,18 @@ using UnityEngine;
 
 public class MoveLeft : MonoBehaviour
 {
-    private void Update()
+    [SerializeField] private float _moveSpeed = 1f;
+    [SerializeField] private bool _isParallax = false;
+
+    private void FixedUpdate()
     {
         if (GameManager.Instance.isFinished) return;
 
-        transform.Translate(SpawnManager.GlobalSpeed * Time.deltaTime * Vector3.left);
+        transform.Translate(SpawnManager.GlobalSpeed * Time.deltaTime * Vector3.left * _moveSpeed);
 
-        if (transform.position.x < -15f)
+        float gameObjectTransformX = _isParallax ? transform.localPosition.x : transform.position.x;
+
+        if (gameObjectTransformX < -15f && !_isParallax)
         {
             Destroy(gameObject);
         }
